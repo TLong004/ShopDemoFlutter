@@ -40,6 +40,15 @@ class ProductService {
     }
   }
 
+  Future<Response> fetchProductsByCategory(String category) async {
+    try {
+      final response = await _dio.get('/category/$category');
+      return response;
+    } on DioException catch (e) {
+      throw _handleError(e);
+    }
+  }
+
   String _handleError(DioException e) {
     if (e.type == DioExceptionType.connectionError) return "Lỗi kết nối quá hạn.";
     return e.message ?? "Đã xảy ra lỗi không xác định.";

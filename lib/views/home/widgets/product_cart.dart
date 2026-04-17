@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shopdemo/models/product.dart';
+import 'package:shopdemo/views/home/bloc/cart_bloc/cart_bloc.dart';
 
 class ProductCart extends StatelessWidget {
   final Product product;
@@ -46,6 +48,7 @@ class ProductCart extends StatelessWidget {
             right: 5,
             child: ElevatedButton(
               onPressed: () {
+                context.read<CartBloc>().add(AddToCart(product));
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,

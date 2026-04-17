@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:shopdemo/views/pages/home_page.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shopdemo/repositories/product_repository.dart';
+import 'package:shopdemo/views/home/bloc/cart_bloc/cart_bloc.dart';
+import 'package:shopdemo/views/home/bloc/product_bloc/product_bloc.dart';
+import 'package:shopdemo/views/home/cubit/banner_cubit.dart';
+import 'package:shopdemo/views/home/cubit/category_cubit.dart';
+import 'package:shopdemo/views/main/main_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -8,18 +14,40 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+    return RepositoryProvider(
+      create: (context) => ProductRepository(),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) => ProductBloc(
+              productRepository: context.read<ProductRepository>(),
+            )..add(LoadProducts()),
+          ),
+          BlocProvider(
+            create: (context) => BannerCubit(
+              productRepository: context.read<ProductRepository>(),
+            )..loadBanners(),
+          ),
+          BlocProvider(
+            create: (context) => CategoryCubit(
+              productRepository: context.read<ProductRepository>(),
+            )..loadCategories(),
+          ),
+          BlocProvider(
+            create:  (context) => CartBloc(
+              cartProducts: []
+            )
+          ),
+        ],
+        child: MaterialApp(
+          title: 'Flutter Demo',
+          theme: ThemeData(primarySwatch: Colors.blue),
+          debugShowCheckedModeBanner: false,
+          home: const MainPage(),
+        ),
       ),
-      debugShowCheckedModeBanner: false,
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const HomePage(),
-      },
     );
   }
 }
