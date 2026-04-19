@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shopdemo/repositories/product_repository.dart';
-import 'package:shopdemo/views/home/bloc/cart_bloc/cart_bloc.dart';
+import 'package:shopdemo/views/cart/bloc/cart_bloc/cart_bloc.dart';
 import 'package:shopdemo/views/home/bloc/product_bloc/product_bloc.dart';
 import 'package:shopdemo/views/home/cubit/banner_cubit.dart';
 import 'package:shopdemo/views/home/cubit/category_cubit.dart';
@@ -36,9 +36,7 @@ class MyApp extends StatelessWidget {
             )..loadCategories(),
           ),
           BlocProvider(
-            create:  (context) => CartBloc(
-              cartProducts: []
-            )
+            create:  (context) => CartBloc()
           ),
         ],
         child: MaterialApp(

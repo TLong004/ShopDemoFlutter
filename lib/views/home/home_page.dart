@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shopdemo/views/home/bloc/cart_bloc/cart_bloc.dart';
+import 'package:shopdemo/views/cart/bloc/cart_bloc/cart_bloc.dart';
 import 'package:shopdemo/views/home/bloc/product_bloc/product_bloc.dart';
 import 'package:shopdemo/views/home/widgets/banner_card.dart';
 import 'package:shopdemo/views/home/widgets/category_card.dart';
@@ -18,8 +18,9 @@ class HomePage extends StatelessWidget {
         backgroundColor: Colors.white,
       ),
       body: BlocListener<CartBloc, CartState>(
+        listenWhen: (previous, current) => previous.status != current.status && current.status == CartStatus.success,
         listener: (context, state) {
-          if (state is CartLoaded && state.message != null) {
+          if (state.message != null) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message!),

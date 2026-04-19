@@ -8,6 +8,7 @@ class Product {
   final double rating;
   final List<String> images;
   final String thumbnail;
+  final int quantity;
 
   Product({
     required this.id,
@@ -18,7 +19,33 @@ class Product {
     required this.rating,
     required this.images,
     required this.thumbnail,
+    this.quantity = 1,
   });
+
+  Product copyWith({
+    int? id,
+    String? title,
+    String? description,
+    String? category,
+    double? price,
+    double? rating,
+    List<String>? images,
+    String? thumbnail,
+    int? quantity,
+  }) {
+    return Product(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      category: category ?? this.category,
+      price: price ?? this.price,
+      rating: rating ?? this.rating,
+      images: images ?? this.images,
+      thumbnail: thumbnail ?? this.thumbnail,
+      quantity: quantity ?? this.quantity,
+    );
+  }
+
 
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
