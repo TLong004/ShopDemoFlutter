@@ -4,15 +4,19 @@ class DioExceptions {
   static String fromDioError(DioException error) {
     switch (error.type) {
       case DioExceptionType.connectionTimeout:
-        return "lỗi kết nối quá hạn";
+        return "Lỗi kết nối quá hạn";
       case DioExceptionType.sendTimeout:
-        return "lỗi gửi quá hạn";
+        return "Lỗi gửi yêu cầu quá hạn";
       case DioExceptionType.receiveTimeout:
         return "Phản hồi từ server quá chậm";
       case DioExceptionType.badResponse:
         return _handleError(error.response?.statusCode, error.response?.data);
       case DioExceptionType.cancel:
         return "Yêu cầu đã bị hủy";
+      case DioExceptionType.connectionError:
+        return "Không có kết nối internet";
+      case DioExceptionType.badCertificate:
+        return "Chứng chỉ bảo mật không hợp lệ";
       case DioExceptionType.unknown:
         return "Đã xảy ra lỗi không xác định: ${error.message}";
       default:

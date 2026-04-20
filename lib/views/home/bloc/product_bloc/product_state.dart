@@ -38,3 +38,10 @@ final class ProductByCategoryLoaded extends ProductState {
   @override
   List<Object> get props => [products, category];
 }
+final class ProductLoadedSearch extends ProductState {
+  List<Product> products;
+  ProductLoadedSearch(this.products);
+
+  @override
+  List<Object> get props => [products];
+}

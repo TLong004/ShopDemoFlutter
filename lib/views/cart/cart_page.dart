@@ -45,19 +45,12 @@ class CartPage extends StatelessWidget {
                   ),
                 );
               } else {
-                return Column(
-                  children: [
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: state.products.length,
-                        itemBuilder: (context, index) {
-                          final product = state.products[index];
-                          return ProductCard2(product: product);
-                        }
-                      ),
-                    )
-                    
-                  ],
+                return ListView.builder(
+                  itemCount: state.products.length,
+                  itemBuilder: (context, index) {
+                    final product = state.products[index];
+                    return ProductCard2(product: product);
+                  }
                 );
               }
             }
@@ -91,7 +84,6 @@ class CartPage extends StatelessWidget {
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      // Logic thanh toán
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,

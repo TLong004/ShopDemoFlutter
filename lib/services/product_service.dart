@@ -5,52 +5,22 @@ class ProductService {
   final Dio _dio = DioClient.instance();
 
   Future<Response> fetchAllProducts() async {
-    try {
-      final response = await _dio.get('');
-      return response;
-    } on DioException catch (e) {
-      throw _handleError(e);
-    }
+    return await _dio.get('');
   }
 
   Future<Response> fetchBanner() async {
-    try {
-      final response = await _dio.get('?limit=5');
-      return response;
-    } on DioException catch (e) {
-      throw _handleError(e);
-    }
+    return await _dio.get('?limit=5');
   }
 
   Future<Response> fetchAllCategories() async {
-    try {
-      final response = await _dio.get('/categories');
-      return response;
-    } on DioException catch (e) {
-      throw _handleError(e);
-    }
+    return await _dio.get('/categories');
   }
 
   Future<Response> searchProducts(String query) async {
-    try {
-      final response = await _dio.get('/search', queryParameters: {'q': query});
-      return response;
-    } on DioException catch (e) {
-      throw _handleError(e);
-    }
+    return await _dio.get('/search', queryParameters: {'q': query});
   }
 
   Future<Response> fetchProductsByCategory(String category) async {
-    try {
-      final response = await _dio.get('/category/$category');
-      return response;
-    } on DioException catch (e) {
-      throw _handleError(e);
-    }
-  }
-
-  String _handleError(DioException e) {
-    if (e.type == DioExceptionType.connectionError) return "Lỗi kết nối quá hạn.";
-    return e.message ?? "Đã xảy ra lỗi không xác định.";
+    return await _dio.get('/category/$category');
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shopdemo/models/product.dart';
 import 'package:shopdemo/views/cart/bloc/cart_bloc/cart_bloc.dart';
+import 'package:shopdemo/views/home/detail_page.dart';
 
 class ProductCart extends StatelessWidget {
   final Product product;
@@ -34,7 +35,12 @@ class ProductCart extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(product.title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => DetailPage(product: product,)));
+                        },
+                        child: Text(product.title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold))
+                      ),
                       Text('\$${product.price}'),
                       const SizedBox(height: 40), 
                     ],

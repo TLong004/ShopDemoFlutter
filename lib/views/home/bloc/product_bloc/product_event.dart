@@ -8,8 +8,14 @@ sealed class ProductEvent extends Equatable {
 }
 
 final class LoadProducts extends ProductEvent {}
-final class RefreshProducts extends ProductEvent {}
-final class ErrorProducts extends ProductEvent {}
+final class ErrorProducts extends ProductEvent {
+  final String message;
+  const ErrorProducts(this.message);
+
+  @override
+  List<Object> get props => [message];
+
+}
 final class LoadProductsByCategory extends ProductEvent {
   final String category;
 
@@ -18,3 +24,11 @@ final class LoadProductsByCategory extends ProductEvent {
   @override
   List<Object> get props => [category];
 }
+final class SearchProduct extends ProductEvent {
+  final String query;
+  const SearchProduct(this.query);
+
+  @override
+  List<Object> get props => [query];
+}
+class ClearSearch extends ProductEvent {}
