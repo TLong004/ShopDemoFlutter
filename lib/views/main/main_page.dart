@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shopdemo/views/cart/cart_page.dart';
 import 'package:shopdemo/views/cart/bloc/cart_bloc/cart_bloc.dart';
+import 'package:shopdemo/views/chart/chart.dart';
 import 'package:shopdemo/views/home/home_page.dart';
 import 'package:shopdemo/views/profile/profile_page.dart';
 import 'package:shopdemo/views/wallet/wallet_page.dart';
@@ -21,6 +22,7 @@ class _MainPageState extends State<MainPage> {
     const CartPage(),
     const WalletPage(),
     const ProfilePage(),
+    const Chart(),
   ];
 
   @override
@@ -57,6 +59,7 @@ class _MainPageState extends State<MainPage> {
           _buildCartNavItem(Icons.shopping_cart, Icons.shopping_cart_outlined, 1),
           _buildNavItem(Icons.account_balance_wallet, Icons.account_balance_wallet_outlined, 2),
           _buildNavItem(Icons.person, Icons.person_outline, 3),
+          _buildNavItem(Icons.pie_chart, Icons.pie_chart_outline, 4),
         ],
       ),
     );
