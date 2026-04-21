@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shopdemo/models/product.dart';
 import 'package:shopdemo/views/cart/bloc/cart_bloc/cart_bloc.dart';
+import 'package:shopdemo/views/home/widgets/review_item.dart';
 
 class DetailPage extends StatefulWidget {
   final Product product;
@@ -13,6 +14,8 @@ class DetailPage extends StatefulWidget {
 
 class _DetailPageState extends State<DetailPage> {
   late String bannerUrl;
+
+  bool _isShowReview = false;
 
   @override
   void initState() {
@@ -119,6 +122,8 @@ class _DetailPageState extends State<DetailPage> {
                   ],
                 ),
               ),
+
+              if (_isShowReview) _buildReviewSection(),
             ],
           ),
         ),
@@ -144,7 +149,9 @@ class _DetailPageState extends State<DetailPage> {
             ),
             ElevatedButton(
               onPressed: () {
-                context.read<CartBloc>().add(StartCheckout());
+                setState(() {
+                  _isShowReview = !_isShowReview;
+                });
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,
@@ -161,6 +168,23 @@ class _DetailPageState extends State<DetailPage> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildReviewSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        const Text(
+          'Đánh giá sản phẩm',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 10),
+        ReviewItem(),
+      ],
     );
   }
 }

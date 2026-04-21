@@ -40,6 +40,8 @@ dependencies:
   rxdart: ^0.28.0
   flutter_echarts: ^2.4.0
   connectivity_plus: ^6.0.3
+  flutter_rating_bar: ^4.0.1
+  image_picker: ^1.2.1
 
 dev_dependencies:
   flutter_test:
