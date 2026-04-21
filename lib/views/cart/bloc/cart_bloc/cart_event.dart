@@ -45,3 +45,13 @@ final class UpdateQuantity extends CartEvent {
   final int newQuantity;
   UpdateQuantity(this.product, this.newQuantity);
 }
+
+final class StartCheckout extends CartEvent {}
+
+final class UpdateProductComment extends CartEvent {
+  final int productId;
+  final String comment;
+  const UpdateProductComment(this.productId, this.comment);
+  @override
+  List<Object> get props => [productId, comment];
+}

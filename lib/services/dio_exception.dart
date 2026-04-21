@@ -19,8 +19,6 @@ class DioExceptions {
         return "Chứng chỉ bảo mật không hợp lệ";
       case DioExceptionType.unknown:
         return "Đã xảy ra lỗi không xác định: ${error.message}";
-      default:
-        return "Hệ thống đang gặp sự cố.";
     }
   }
 

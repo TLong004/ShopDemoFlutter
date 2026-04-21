@@ -143,7 +143,9 @@ class _DetailPageState extends State<DetailPage> {
               ),
             ),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                context.read<CartBloc>().add(StartCheckout());
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,
                 padding: const EdgeInsets.symmetric(

@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shopdemo/services/bloc/connectivity_bloc.dart';
 import 'package:shopdemo/views/cart/cart_page.dart';
 import 'package:shopdemo/views/cart/bloc/cart_bloc/cart_bloc.dart';
 import 'package:shopdemo/views/chart/chart.dart';
 import 'package:shopdemo/views/home/home_page.dart';
 import 'package:shopdemo/views/profile/profile_page.dart';
 import 'package:shopdemo/views/wallet/wallet_page.dart';
+import 'package:shopdemo/views/home/bloc/product_bloc/product_bloc.dart';
+import 'package:shopdemo/views/home/cubit/banner_cubit.dart';
+import 'package:shopdemo/views/home/cubit/category_cubit.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -17,24 +21,64 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   int _currentIndex = 0;
 
-  final List<Widget> _pages = [
-    const HomePage(),
-    const CartPage(),
-    const WalletPage(),
-    const ProfilePage(),
-    const Chart(),
-  ];
+  List<Widget> _buildPages() {
+    return [
+      const HomePage(),
+      const CartPage(),
+      const WalletPage(),
+      const ProfilePage(),
+      _currentIndex == 4 ? Chart() : const SizedBox.shrink(),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        extendBody: true,
-        body: IndexedStack(
-          index: _currentIndex,
-          children: _pages,
-        ),
-        bottomNavigationBar: _buildCustomBottomBar(),
-      );
+    return BlocConsumer<ConnectivityBloc, ConnectivityState>(
+      listenWhen: (previous, current) => previous.status != current.status,
+      listener: (context, state) {
+        final messenger = ScaffoldMessenger.of(context);
+        messenger.clearSnackBars();
+
+        if (state.status == ConnectivityStatus.disconnected) {
+          messenger.showSnackBar(
+            SnackBar(
+              content: const Text("Không có kết nối internet"),
+              backgroundColor: Colors.red,
+              duration: Duration(days: 1), 
+              showCloseIcon: true,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        } else if (state.status == ConnectivityStatus.connected) {
+          messenger.showSnackBar(
+            SnackBar(
+              content: Text("Đã có kết nối trở lại"),
+              backgroundColor: Colors.green,
+              duration: const Duration(seconds: 3), 
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+ 
+          Future.delayed(const Duration(milliseconds: 500), () {
+            if (context.mounted) {
+              context.read<ProductBloc>().add(LoadProducts());
+              context.read<BannerCubit>().loadBanners();
+              context.read<CategoryCubit>().loadCategories();
+            }
+          });
+        }
+      },
+      builder: (context, state) {
+        return  Scaffold(
+          extendBody: true,
+          body: IndexedStack(
+            index: _currentIndex,
+            children: _buildPages(),
+          ),
+          bottomNavigationBar: _buildCustomBottomBar(),
+        );
+      }
+    );
   }
 
   Widget _buildCustomBottomBar() {

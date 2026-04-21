@@ -39,6 +39,7 @@ dependencies:
   equatable: ^2.0.5
   rxdart: ^0.28.0
   flutter_echarts: ^2.4.0
+  connectivity_plus: ^6.0.3
 
 dev_dependencies:
   flutter_test:

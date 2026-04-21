@@ -117,5 +117,15 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     on<MarkCartAsViewed>((event, emit) {
       emit(state.copyWith(unviewedCount: 0));
     });
+
+    on<StartCheckout>((event, emit) {
+      emit(state.copyWith(isCheckoutMode: true));
+    });
+
+    on<UpdateProductComment>((event, emit) {
+      final newComments = Map<int, String>.from(state.productComments);
+      newComments[event.productId] = event.comment;
+      emit(state.copyWith(productComments: newComments));
+    });
   }
 }

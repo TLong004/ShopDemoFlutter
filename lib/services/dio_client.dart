@@ -12,13 +12,9 @@ class DioClient {
     dio.interceptors.add(InterceptorsWrapper(
       onError: (error, handler) {
         final errorDio = DioExceptions.fromDioError(error);
-        final newError = DioException(
-          requestOptions: error.requestOptions, 
-          error: errorDio, 
-          type: error.type,
-          response: error.response
-        );
-        return handler.next(newError);
+        return handler.next(error.copyWith(
+          error: errorDio,
+        ));
       },
     ));
 

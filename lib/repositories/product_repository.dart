@@ -12,7 +12,7 @@ class ProductRepository {
       final List<dynamic> data = response.data['products'];
       return data.map((json) => Product.fromJson(json)).toList();
     } on DioException catch (e) {
-      throw Exception(e.error.toString());
+      throw e.error.toString();
     }
   }
 
@@ -22,7 +22,7 @@ class ProductRepository {
       final List<dynamic> data = response.data['products'];
       return data.map<String>((json) => json['thumbnail'] as String).toList();
     } on DioException catch (e) {
-      throw Exception(e.error.toString());
+      throw e.error.toString();
     }
   }
 
@@ -32,7 +32,7 @@ class ProductRepository {
       final List<dynamic> data = response.data;
       return data.map((json) => Category.fromJson(json)).toList();
     } on DioException catch (e) {
-      throw Exception(e.error.toString());
+      throw e.error.toString();
     }
   }
 
@@ -42,7 +42,7 @@ class ProductRepository {
       final List<dynamic> data = response.data['products'];
       return data.map((json) => Product.fromJson(json)).toList();
     } on DioException catch (e) {
-      throw Exception(e.error.toString());
+      throw e.error.toString();
     }
   }
 
@@ -55,7 +55,7 @@ class ProductRepository {
       final List<dynamic> data = response.data['products'];
       return data.map((json) => Product.fromJson(json)).toList();
     } on DioException catch (e) {
-      throw Exception(e.error.toString());
+      throw e.error.toString();
     }
   }
   

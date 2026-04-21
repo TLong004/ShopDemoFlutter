@@ -17,8 +17,10 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       try {
         final products = await _productRepository.fetchAllProducts();
         emit(ProductLoaded(products, 'All'));
+      } on DioException catch (e) {
+        emit(ProductError(e.error?.toString() ?? "Lỗi kết nối"));
       } catch (e) {
-        emit(ProductError(e is Exception ? e.toString().replaceFirst('Exception: ', '') : e.toString()));
+        emit(ProductError(e.toString()));
       }
     });
     on<LoadProductsByCategory>((event, emit) async {
@@ -26,8 +28,10 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       try { 
         final products = await _productRepository.fetchProductsByCategory(event.category);
         emit(ProductByCategoryLoaded(List.from( products), event.category));
+      } on DioException catch (e) {
+        emit(ProductError(e.error?.toString() ?? "Lỗi tải danh mục"));
       } catch (e) {
-        emit(ProductError(e.toString().replaceFirst('Exception: ', '')));
+        emit(ProductError(e.toString()));
       }
     });
     on<SearchProduct>((event, emit) async{

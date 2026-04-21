@@ -1,6 +1,8 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shopdemo/repositories/product_repository.dart';
+import 'package:shopdemo/services/bloc/connectivity_bloc.dart';
 import 'package:shopdemo/views/cart/bloc/cart_bloc/cart_bloc.dart';
 import 'package:shopdemo/views/home/bloc/product_bloc/product_bloc.dart';
 import 'package:shopdemo/views/home/cubit/banner_cubit.dart';
@@ -37,6 +39,11 @@ class MyApp extends StatelessWidget {
           ),
           BlocProvider(
             create:  (context) => CartBloc()
+          ),
+          BlocProvider(
+            create: (context) => ConnectivityBloc(
+              
+            ),
           ),
         ],
         child: MaterialApp(
