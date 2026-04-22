@@ -84,6 +84,26 @@ class CartPage extends StatelessWidget {
                   ),
                   ElevatedButton(
                     onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('Xác nhận thanh toán'),
+                          content: const Text('Bạn có chắc chắn muốn thanh toán các sản phẩm trong giỏ hàng không?'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('Hủy'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                context.read<CartBloc>().add(StartCheckout());
+                                Navigator.pop(context);
+                              },
+                              child: const Text('Xác nhận'),
+                            ),
+                          ],
+                        ),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,

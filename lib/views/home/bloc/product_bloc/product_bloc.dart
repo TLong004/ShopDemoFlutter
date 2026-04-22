@@ -4,6 +4,7 @@ import 'package:equatable/equatable.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:shopdemo/models/product.dart';
 import 'package:shopdemo/repositories/product_repository.dart';
+import 'package:shopdemo/services/dio_exception.dart';
 
 part 'product_event.dart';
 part 'product_state.dart';
@@ -18,7 +19,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         final products = await _productRepository.fetchAllProducts();
         emit(ProductLoaded(products, 'All'));
       } on DioException catch (e) {
-        emit(ProductError(e.error?.toString() ?? "Lỗi kết nối"));
+        emit(ProductError(DioExceptions.fromDioError(e)));
       } catch (e) {
         emit(ProductError(e.toString()));
       }
@@ -29,7 +30,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         final products = await _productRepository.fetchProductsByCategory(event.category);
         emit(ProductByCategoryLoaded(List.from( products), event.category));
       } on DioException catch (e) {
-        emit(ProductError(e.error?.toString() ?? "Lỗi tải danh mục"));
+        emit(ProductError(DioExceptions.fromDioError(e)));
       } catch (e) {
         emit(ProductError(e.toString()));
       }

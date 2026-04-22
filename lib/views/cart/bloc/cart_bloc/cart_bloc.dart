@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:shopdemo/models/product.dart';
+import 'package:shopdemo/services/shared_prefs_helper.dart';
 
 part 'cart_event.dart';
 part 'cart_state.dart';
@@ -118,14 +119,18 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       emit(state.copyWith(unviewedCount: 0));
     });
 
-    on<StartCheckout>((event, emit) {
-      emit(state.copyWith(isCheckoutMode: true));
+    on<StartCheckout>((event, emit) async {
+      final updatedMap = state.productMap.map((id, product) {
+        SharedPrefsHelper.saveCheckedOutProductId(id);
+        return MapEntry(id, product.copyWith(isCheckOut: true));
+      });
+      
+      emit(state.copyWith(
+        productMap: updatedMap,
+        isCheckoutMode: true,
+      ));
     });
 
-    on<UpdateProductComment>((event, emit) {
-      final newComments = Map<int, String>.from(state.productComments);
-      newComments[event.productId] = event.comment;
-      emit(state.copyWith(productComments: newComments));
-    });
+
   }
 }

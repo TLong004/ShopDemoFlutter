@@ -9,6 +9,7 @@ class Product {
   final List<String> images;
   final String thumbnail;
   final int quantity;
+  final bool isCheckOut;
 
   Product({
     required this.id,
@@ -20,6 +21,7 @@ class Product {
     required this.images,
     required this.thumbnail,
     this.quantity = 1,
+    this.isCheckOut = false,
   });
 
   Product copyWith({
@@ -32,6 +34,7 @@ class Product {
     List<String>? images,
     String? thumbnail,
     int? quantity,
+    bool? isCheckOut,
   }) {
     return Product(
       id: id ?? this.id,
@@ -43,6 +46,7 @@ class Product {
       images: images ?? this.images,
       thumbnail: thumbnail ?? this.thumbnail,
       quantity: quantity ?? this.quantity,
+      isCheckOut: isCheckOut ?? this.isCheckOut,
     );
   }
 

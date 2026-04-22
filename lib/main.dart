@@ -1,15 +1,20 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shopdemo/repositories/product_repository.dart';
 import 'package:shopdemo/services/bloc/connectivity_bloc.dart';
+import 'package:shopdemo/services/local_notification_service.dart';
+import 'package:shopdemo/services/shared_prefs_helper.dart';
 import 'package:shopdemo/views/cart/bloc/cart_bloc/cart_bloc.dart';
 import 'package:shopdemo/views/home/bloc/product_bloc/product_bloc.dart';
 import 'package:shopdemo/views/home/cubit/banner_cubit.dart';
 import 'package:shopdemo/views/home/cubit/category_cubit.dart';
 import 'package:shopdemo/views/main/main_page.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SharedPrefsHelper.init();
+  await LocalNotificationService.init();
+
   runApp(const MyApp());
 }
 

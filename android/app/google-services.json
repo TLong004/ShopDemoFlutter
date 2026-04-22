@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "530275138357",
+    "project_id": "shop-a7b6e",
+    "storage_bucket": "shop-a7b6e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:530275138357:android:3d93c6b4269a7ffecfea7c",
+        "android_client_info": {
+          "package_name": "com.gem.shopdemo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDS2CRnPScS9LOujbkdJQ9qhh-Pq3T3z_k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

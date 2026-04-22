@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shopdemo/models/product.dart';
+import 'package:shopdemo/services/database.dart';
 import 'package:shopdemo/views/cart/bloc/cart_bloc/cart_bloc.dart';
 import 'package:shopdemo/views/home/widgets/review_item.dart';
+import 'package:shopdemo/services/shared_prefs_helper.dart';
 
 class DetailPage extends StatefulWidget {
   final Product product;
@@ -14,8 +16,6 @@ class DetailPage extends StatefulWidget {
 
 class _DetailPageState extends State<DetailPage> {
   late String bannerUrl;
-
-  bool _isShowReview = false;
 
   @override
   void initState() {
@@ -37,7 +37,18 @@ class _DetailPageState extends State<DetailPage> {
           icon: Icon(Icons.arrow_back_ios),
         ),
       ),
-      body: SingleChildScrollView(
+      body: BlocBuilder<CartBloc, CartState>(
+        builder: (context, cartState) {
+          final Product? productInCart = cartState.productMap[widget.product.id];
+          
+          final bool isProductCheckedOut = 
+              (productInCart?.isCheckOut ?? false) || 
+              SharedPrefsHelper.isProductCheckedOut(widget.product.id) || 
+              widget.product.isCheckOut;
+
+          
+
+          return SingleChildScrollView(
           child: Column(
             children: [
               SizedBox(
@@ -123,10 +134,12 @@ class _DetailPageState extends State<DetailPage> {
                 ),
               ),
 
-              if (_isShowReview) _buildReviewSection(),
+              if (isProductCheckedOut) _buildReviewSection(),
             ],
           ),
-        ),
+        );
+        },
+      ),
       bottomNavigationBar: SafeArea(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -149,9 +162,7 @@ class _DetailPageState extends State<DetailPage> {
             ),
             ElevatedButton(
               onPressed: () {
-                setState(() {
-                  _isShowReview = !_isShowReview;
-                });
+                
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,
@@ -183,8 +194,12 @@ class _DetailPageState extends State<DetailPage> {
           ),
         ),
         const SizedBox(height: 10),
-        ReviewItem(),
+        ReviewItem(productId: widget.product.id),
       ],
     );
+  }
+
+  Widget _buildReview(){
+    return Center(child: Text("Đánh giá sản phẩm" ,));
   }
 }
