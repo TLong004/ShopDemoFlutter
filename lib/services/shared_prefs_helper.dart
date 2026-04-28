@@ -7,7 +7,6 @@ class SharedPrefsHelper {
     _prefs = await SharedPreferences.getInstance();
   }
 
-  // Lưu ID sản phẩm đã thanh toán vào danh sách
   static Future<void> saveCheckedOutProductId(int id) async {
     List<String> checkedOutIds = _prefs.getStringList('checked_out_ids') ?? [];
     if (!checkedOutIds.contains(id.toString())) {

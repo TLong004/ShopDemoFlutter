@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import 'package:shopdemo/services/database.dart';
+import 'package:shopdemo/services/file_service.dart';
 import 'package:shopdemo/services/local_notification_service.dart';
 import 'package:shopdemo/views/home/widgets/review_card.dart';
 
@@ -18,7 +19,7 @@ class ReviewItem extends StatefulWidget {
 class _WriteReviewFormState extends State<ReviewItem> {
   int _currentRating = 0; 
   final TextEditingController _commentController = TextEditingController();
-  final List<File> _selectedImages = []; 
+  List<File> _selectedImages = []; 
   final ImagePicker _picker = ImagePicker();
   bool _isDataLoading = false;
   bool _checkReview = false;
@@ -40,6 +41,12 @@ class _WriteReviewFormState extends State<ReviewItem> {
         final lastReview = reviews.last;
         _currentRating = lastReview[DatabaseHelper.columnRating] as int;
         _commentController.text = lastReview[DatabaseHelper.columnComment] as String;
+        final String? imagePaths = lastReview[DatabaseHelper.columnImages] as String?;
+        _selectedImages = (imagePaths != null && imagePaths.isNotEmpty)
+            ? imagePaths.split(',').where((path) => path.isNotEmpty).map((path) => File(path)).toList()
+            : [];
+      } else {
+        _checkReview = false;
       }
     } catch (e) {
       print("Lỗi khi tải review: $e");
@@ -53,8 +60,9 @@ class _WriteReviewFormState extends State<ReviewItem> {
   Future<void> _pickImage(ImageSource source) async {
     final XFile? pickedFile = await _picker.pickImage(source: source);
     if (pickedFile != null) {
+      String filePath = await FileService.saveFile(File(pickedFile.path));
       setState(() {
-        _selectedImages.add(File(pickedFile.path));
+        _selectedImages.add(File(filePath));
       });
     }
   }
@@ -67,14 +75,16 @@ class _WriteReviewFormState extends State<ReviewItem> {
       permisson = Permission.photos;
     }
 
-    if (await permisson.isGranted) {
+    final status = await permisson.status;
+
+    if (status.isGranted || status.isLimited) {
       _pickImage(source);
-    } else if (await permisson.isDenied){
-      final status = await permisson.request();
-      if (status.isGranted) {
+    } else if (status.isDenied) {
+      final result = await permisson.request();
+      if (result.isGranted || result.isLimited) {
         _pickImage(source);
       } 
-    } else if (await permisson.isPermanentlyDenied) {
+    } else if (status.isPermanentlyDenied || status.isRestricted) {
       _showSettingsDialog();
     }
   }
@@ -100,10 +110,12 @@ class _WriteReviewFormState extends State<ReviewItem> {
   }
 
   void _saveReview() async {
+    final String imagesString = _selectedImages.map((e) => e.path).join(',');    
     Map<String, dynamic> review = {
       DatabaseHelper.columnProductId: widget.productId,
       DatabaseHelper.columnComment: _commentController.text,
       DatabaseHelper.columnRating: _currentRating,
+      DatabaseHelper.columnImages: imagesString,
     };
     final id = await DatabaseHelper.instance.insertReview(review);
     
@@ -154,6 +166,7 @@ class _WriteReviewFormState extends State<ReviewItem> {
         productId: widget.productId,
         comment: _commentController.text,
         rating: _currentRating,
+        images: _selectedImages,
       );
     }
     return Container(
@@ -242,6 +255,7 @@ class _WriteReviewFormState extends State<ReviewItem> {
                         icon: const Icon(Icons.cancel, color: Colors.red),
                         onPressed: () {
                           setState(() {
+                            FileService.deleteFil(file.path);
                             _selectedImages.remove(file);
                           });
                         },

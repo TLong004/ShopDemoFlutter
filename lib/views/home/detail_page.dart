@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shopdemo/models/product.dart';
-import 'package:shopdemo/services/database.dart';
 import 'package:shopdemo/views/cart/bloc/cart_bloc/cart_bloc.dart';
 import 'package:shopdemo/views/home/widgets/review_item.dart';
 import 'package:shopdemo/services/shared_prefs_helper.dart';
@@ -28,13 +27,13 @@ class _DetailPageState extends State<DetailPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text("Shop Demo"),
+        title: const Text("Shop Demo"),
         backgroundColor: Colors.white,
         leading: IconButton(
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: Icon(Icons.arrow_back_ios),
+          icon: const Icon(Icons.arrow_back_ios),
         ),
       ),
       body: BlocBuilder<CartBloc, CartState>(
@@ -45,8 +44,6 @@ class _DetailPageState extends State<DetailPage> {
               (productInCart?.isCheckOut ?? false) || 
               SharedPrefsHelper.isProductCheckedOut(widget.product.id) || 
               widget.product.isCheckOut;
-
-          
 
           return SingleChildScrollView(
           child: Column(
@@ -129,7 +126,10 @@ class _DetailPageState extends State<DetailPage> {
                       ),
                     ),
 
-                    const SizedBox(height: 100),
+                    const SizedBox(height: 10),
+                    Divider(
+                      color: Colors.grey.shade300,
+                    ),
                   ],
                 ),
               ),
@@ -197,9 +197,5 @@ class _DetailPageState extends State<DetailPage> {
         ReviewItem(productId: widget.product.id),
       ],
     );
-  }
-
-  Widget _buildReview(){
-    return Center(child: Text("Đánh giá sản phẩm" ,));
   }
 }

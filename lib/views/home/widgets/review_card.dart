@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 class ReviewCard extends StatelessWidget {
@@ -5,6 +7,8 @@ class ReviewCard extends StatelessWidget {
   final String comment;
   final int rating;
   final String? userName; 
+  final List<File> images;
+
 
   const ReviewCard({
     super.key,
@@ -12,6 +16,7 @@ class ReviewCard extends StatelessWidget {
     required this.comment,
     required this.rating,
     this.userName = "Người dùng ẩn danh",
+    this.images = const [],
   });
 
   @override
@@ -75,7 +80,28 @@ class ReviewCard extends StatelessWidget {
               height: 1.4,
             ),
           ),
-              
+
+          if (images.isNotEmpty)
+            Column(
+              children: [
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: images.map((path) {
+                    return ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.file(
+                        path, 
+                        width: 80,
+                        height: 80,
+                        fit: BoxFit.cover, 
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ],
+            ),
         ],
       ),
     );

@@ -36,7 +36,7 @@ class LocalNotificationService {
       channelDescription: 'channel_description',
       importance: Importance.max,
       priority: Priority.high,
-      ticker: 'ticker',
+      ticker: 'Bạn có thông báo mới',
     );
 
     const iosDetail = DarwinNotificationDetails(

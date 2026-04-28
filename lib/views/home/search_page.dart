@@ -6,7 +6,7 @@ import 'package:shopdemo/views/home/widgets/product_cart.dart';
 
 class SearchPage extends StatefulWidget {
 
-  SearchPage({super.key});
+  const SearchPage({super.key});
 
   @override
   State<SearchPage> createState() => _SearchPageState();
@@ -32,14 +32,14 @@ class _SearchPageState extends State<SearchPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text("Shop Demo"),
+        title: const Text("Shop Demo"),
         backgroundColor: Colors.white,
         leading: IconButton(
           onPressed: () {
             context.read<ProductBloc>().add(ClearSearch());
             Navigator.pop(context);
           }, 
-          icon: Icon(Icons.arrow_back_ios),
+          icon: const Icon(Icons.arrow_back_ios),
         ),
       ),
       body: Column(

@@ -10,6 +10,8 @@ class DatabaseHelper {
   static const columnProductId = 'product_id';
   static const columnComment = 'comment';
   static const columnRating = 'rating';
+  static const columnImages = 'images';
+
 
 
   DatabaseHelper._privateConstructor();
@@ -34,7 +36,8 @@ class DatabaseHelper {
         $columnId INTEGER PRIMARY KEY AUTOINCREMENT,
         $columnProductId INTEGER NOT NULL,
         $columnComment TEXT NOT NULL,
-        $columnRating INTEGER NOT NULL
+        $columnRating INTEGER NOT NULL,
+        $columnImages TEXT
       )
     ''');
   }
