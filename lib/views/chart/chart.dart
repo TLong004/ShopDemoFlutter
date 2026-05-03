@@ -10,7 +10,7 @@ class Chart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final option = jsonEncode({
+    final option1 = jsonEncode({
       'visualMap': {
         'type': 'piecewise',
         'pieces': [
@@ -43,19 +43,67 @@ class Chart extends StatelessWidget {
       ]
     });
 
+    final option2 = jsonEncode({
+      'visualMap': {
+        'type': 'continuous',
+        'min': 0,
+        'max': 2500,         
+        'text': ['Cao', 'Thấp'],
+        'calculable': true,
+        'inRange': {
+          'color': ['#e0f3f8', '#ffffbf', '#fee090', '#d73027']
+        },
+        'bottom': '10%',
+        'left': 'center',
+        'orient': 'horizontal'
+      },
+      'series': [
+        {
+          'name': 'Doanh số',
+          'type': 'map',
+          'map': 'VN_MAP_2', 
+          'roam': true,   
+          'emphasis': {
+            'label': { 'show': true, 'color': '#000' },
+            'itemStyle': { 'areaColor': '#ffcc00' } 
+          },
+          'data': densityData 
+        }
+      ]
+    });
+
     return Scaffold(
       body: Container(
         width: double.infinity,
         height: double.infinity,
         color: Colors.white,
-        child: Echarts(
-          key: ValueKey(option), 
-          extraScript: '''
-            var mapData = ${jsonEncode(vietnamGeoJson)};
-            echarts.registerMap('VN_MAP', mapData);
-          ''',
-          option: option,
-        )
+        child: Column( 
+          children: [
+            Expanded(
+              child: Echarts(
+                key: ValueKey(option1),
+                extraScript: '''
+                  var mapData = ${jsonEncode(vietnamGeoJson)};
+                  echarts.registerMap('VN_MAP', mapData);
+                ''',
+                option: option1,
+              ),
+            ),
+
+            Container(height: 1, color: Colors.grey.shade300),
+
+            Expanded(
+              child: Echarts(
+                key: ValueKey(option2),
+                extraScript: '''
+                  var mapData = ${jsonEncode(vietnamGeoJson)};
+                  echarts.registerMap('VN_MAP_2', mapData);
+                ''',
+                option: option2,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
