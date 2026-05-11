@@ -1,8 +1,11 @@
+import 'package:alarm/alarm.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:shopdemo/repositories/product_repository.dart';
 import 'package:shopdemo/services/bloc/connectivity_bloc.dart';
+import 'package:shopdemo/services/googlemap_service.dart';
 import 'package:shopdemo/services/local_notification_service.dart';
 import 'package:shopdemo/services/notification_service.dart';
 import 'package:shopdemo/services/shared_prefs_helper.dart';
@@ -14,11 +17,13 @@ import 'package:shopdemo/views/main/main_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  FlutterForegroundTask.initCommunicationPort();
   await Firebase.initializeApp();
   await NotificationService.init();
   await SharedPrefsHelper.init();
   await LocalNotificationService.init();
-
+  await Alarm.init();
+  GooglemapService.instance.init();
   runApp(const MyApp());
 }
 

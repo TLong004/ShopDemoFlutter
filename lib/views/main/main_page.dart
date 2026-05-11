@@ -4,6 +4,7 @@ import 'package:shopdemo/services/bloc/connectivity_bloc.dart';
 import 'package:shopdemo/views/cart/cart_page.dart';
 import 'package:shopdemo/views/cart/bloc/cart_bloc/cart_bloc.dart';
 import 'package:shopdemo/views/chart/chart.dart';
+import 'package:shopdemo/views/google_map/map_tracking_screen.dart';
 import 'package:shopdemo/views/home/home_page.dart';
 import 'package:shopdemo/views/profile/profile_page.dart';
 import 'package:shopdemo/views/wallet/wallet_page.dart';
@@ -28,6 +29,9 @@ class _MainPageState extends State<MainPage> {
       const WalletPage(),
       const ProfilePage(),
       _currentIndex == 4 ? Chart() : const SizedBox.shrink(),
+       MapTrackingScreen(),
+      //AlarmScreen(),
+      //MarkdownDemo(),
     ];
   }
 
@@ -83,11 +87,11 @@ class _MainPageState extends State<MainPage> {
 
   Widget _buildCustomBottomBar() {
     return Container(
-      margin: const EdgeInsets.fromLTRB(50, 0, 50, 30),
-      height: 60,
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 30), 
+      height: 65, 
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: BorderRadius.circular(35),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
@@ -99,12 +103,31 @@ class _MainPageState extends State<MainPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _buildNavItem(Icons.home, Icons.home_outlined, 0),
-          _buildCartNavItem(Icons.shopping_cart, Icons.shopping_cart_outlined, 1),
-          _buildNavItem(Icons.account_balance_wallet, Icons.account_balance_wallet_outlined, 2),
-          _buildNavItem(Icons.person, Icons.person_outline, 3),
-          _buildNavItem(Icons.pie_chart, Icons.pie_chart_outline, 4),
+          Expanded(child: _buildNavItem(Icons.home, Icons.home_outlined, 0)),
+          Expanded(child: _buildCartNavItem(Icons.shopping_cart, Icons.shopping_cart_outlined, 1)),
+          Expanded(child: _buildNavItem(Icons.account_balance_wallet, Icons.account_balance_wallet_outlined, 2)),
+          Expanded(child: _buildNavItem(Icons.person, Icons.person_outline, 3)),
+          Expanded(child: _buildNavItem(Icons.pie_chart, Icons.pie_chart_outline, 4)),
+          Expanded(child: _buildNavItem(Icons.map, Icons.map_outlined, 5)),
         ],
+      ),
+    );
+  }
+
+  Widget _buildIconContent(IconData activeIcon, IconData inactiveIcon, bool isSelected) {
+    return Center( 
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        padding: const EdgeInsets.all(6), 
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.blue.withOpacity(0.1) : Colors.transparent,
+          shape: BoxShape.circle,
+        ),
+        child: Icon(
+          isSelected ? activeIcon : inactiveIcon,
+          color: isSelected ? Colors.blueAccent : Colors.grey.shade500,
+          size: 24, 
+        ),
       ),
     );
   }
@@ -137,27 +160,6 @@ class _MainPageState extends State<MainPage> {
           );
         },
       ),
-    );
-  }
-
-  Widget _buildIconContent(IconData activeIcon, IconData inactiveIcon, bool isSelected) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        AnimatedContainer(
-          duration: const Duration(milliseconds: 250),
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: isSelected ? Colors.blue.withOpacity(0.1) : Colors.transparent,
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            isSelected ? activeIcon : inactiveIcon,
-            color: isSelected ? Colors.blueAccent : Colors.grey.shade500,
-            size: 26,
-          ),
-        ),
-      ],
     );
   }
 }

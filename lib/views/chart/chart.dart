@@ -1,12 +1,49 @@
 import 'dart:convert';
+import 'dart:isolate';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_echarts/flutter_echarts.dart';
 import 'package:shopdemo/views/chart/map.dart';
 import 'package:shopdemo/views/chart/map_data.dart';
 
-class Chart extends StatelessWidget {
-  Chart({super.key});
+String prepareMapScript(Map<String, dynamic> geoJson, String map_name) {
+  final String jsonString = jsonEncode(geoJson);
+  return '''
+      var mapData = $jsonString;
+      echarts.registerMap('$map_name', mapData);
+    ''';
+}
+
+class Chart extends StatefulWidget {
+  const Chart({super.key});
+
+  @override
+  State<Chart> createState() => _ChartState();
+}
+
+class _ChartState extends State<Chart> {
+  String? final1;
+  String? final2;
+  bool _isProcessing = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _initData();
+  }
+
+  Future<void> _initData() async {
+    final script1 = await Isolate.run(() => prepareMapScript(vietnamGeoJson, 'VN_MAP'));
+    final script2 = await Isolate.run(() => prepareMapScript(vietnam2, 'VN_MAP_2'));
+
+    if (mounted) {
+      setState(() {
+        final1 = script1;
+        final2 = script2;
+        _isProcessing = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +110,9 @@ class Chart extends StatelessWidget {
     });
 
     return Scaffold(
-      body: Container(
+      body: _isProcessing ?
+      Center(child: CircularProgressIndicator(),)
+      : Container(
         width: double.infinity,
         height: double.infinity,
         color: Colors.white,
@@ -82,10 +121,7 @@ class Chart extends StatelessWidget {
             Expanded(
               child: Echarts(
                 key: ValueKey(option1),
-                extraScript: '''
-                  var mapData = ${jsonEncode(vietnamGeoJson)};
-                  echarts.registerMap('VN_MAP', mapData);
-                ''',
+                extraScript: final1!,
                 option: option1,
               ),
             ),
@@ -95,10 +131,7 @@ class Chart extends StatelessWidget {
             Expanded(
               child: Echarts(
                 key: ValueKey(option2),
-                extraScript: '''
-                  var mapData = ${jsonEncode(vietnamGeoJson)};
-                  echarts.registerMap('VN_MAP_2', mapData);
-                ''',
+                extraScript: final2!,
                 option: option2,
               ),
             ),
