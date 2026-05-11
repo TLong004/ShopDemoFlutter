@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:shopdemo/models/product.dart';
 import 'package:shopdemo/views/cart/bloc/cart_bloc/cart_bloc.dart';
 import 'package:shopdemo/views/home/widgets/review_item.dart';
 import 'package:shopdemo/services/shared_prefs_helper.dart';
+import 'package:go_router/go_router.dart';
+import 'package:shopdemo/widgets/network_image_widget.dart';
 
 class DetailPage extends StatefulWidget {
   final Product product;
@@ -30,9 +33,7 @@ class _DetailPageState extends State<DetailPage> {
         title: const Text("Shop Demo"),
         backgroundColor: Colors.white,
         leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => context.pop(),
           icon: const Icon(Icons.arrow_back_ios),
         ),
       ),
@@ -57,7 +58,7 @@ class _DetailPageState extends State<DetailPage> {
                     borderRadius: BorderRadius.circular(10),
                     color: Colors.grey.shade200,
                   ),
-                  child: Image.network(bannerUrl, fit: BoxFit.contain),
+                  child: NetworkImageWidget(url: bannerUrl, fit: BoxFit.contain),
                 ),
               ),
               const SizedBox(height: 10),
@@ -87,7 +88,7 @@ class _DetailPageState extends State<DetailPage> {
                             width: 2.0,
                           ),
                         ),
-                        child: Image.network(imageUrl, fit: BoxFit.contain),
+                        child: NetworkImageWidget(url: imageUrl, fit: BoxFit.contain),
                       ),
                     );
                   },
@@ -117,12 +118,16 @@ class _DetailPageState extends State<DetailPage> {
                     ),
                     const SizedBox(height: 30),
 
-                    Text(
-                      widget.product.description,
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey.shade600,
-                        height: 1.5,
+                    MarkdownBody(
+                      data: widget.product.description,
+                      styleSheet: MarkdownStyleSheet(
+                        p: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey.shade600,
+                          height: 1.5,
+                        ),
+                        strong: const TextStyle(fontWeight: FontWeight.bold),
+                        em: const TextStyle(fontStyle: FontStyle.italic),
                       ),
                     ),
 
@@ -162,7 +167,27 @@ class _DetailPageState extends State<DetailPage> {
             ),
             ElevatedButton(
               onPressed: () {
-                
+                showDialog(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: const Text('Xác nhận mua hàng'),
+                    content: Text('Bạn có muốn mua ${widget.product.title} không?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        child: const Text('Hủy'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          context.read<CartBloc>().add(AddToCart(widget.product));
+                          context.read<CartBloc>().add(StartCheckout());
+                          Navigator.pop(ctx);
+                        },
+                        child: const Text('Xác nhận'),
+                      ),
+                    ],
+                  ),
+                );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,

@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class LocalNotificationService {
@@ -30,13 +31,15 @@ class LocalNotificationService {
   }
 
   static Future<void> showNotification(String title, String body) async {
-    const androidDetail = AndroidNotificationDetails(
+    final androidDetail = AndroidNotificationDetails(
       'channel_id',
       'channel_name',
       channelDescription: 'channel_description',
       importance: Importance.max,
       priority: Priority.high,
       ticker: 'Bạn có thông báo mới',
+      enableVibration: true,
+      vibrationPattern: Int64List.fromList([0, 500, 200, 500]),
     );
 
     const iosDetail = DarwinNotificationDetails(
@@ -45,7 +48,7 @@ class LocalNotificationService {
       presentSound: true,
     );
 
-    const notificationDetails = NotificationDetails(
+    final notificationDetails = NotificationDetails(
       android: androidDetail,
       iOS: iosDetail,
     );

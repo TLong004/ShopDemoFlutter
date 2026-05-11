@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:shopdemo/models/alarm_model.dart';
 import 'package:shopdemo/models/user_location.dart';
-import 'package:shopdemo/services/bloc/map_tracking_bloc.dart';
+import 'package:shopdemo/services/local_notification_service.dart';
+import 'package:shopdemo/views/google_map/bloc/map_tracking_bloc.dart';
 import 'package:shopdemo/views/google_map/alarm_list_panel.dart';
 import 'package:shopdemo/views/google_map/stats_panel.dart';
 import 'package:shopdemo/views/google_map/tracking_button.dart';
@@ -31,12 +33,32 @@ class _MapTrackingView extends StatefulWidget {
 class __MapTrackingViewState extends State<_MapTrackingView> {
   GoogleMapController? _mapController;
   bool _showAlarmList = false;
-  bool _hasInitialZoom = false; 
+  bool _hasInitialZoom = false;
+  bool _locationPermissionGranted = false;
 
   static const CameraPosition _initialCamera = CameraPosition(
     target: LatLng(21.0278, 105.8342),
     zoom: 15,
   );
+
+  @override
+  void initState() {
+    super.initState();
+    _requestLocationPermission();
+  }
+
+  Future<void> _requestLocationPermission() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+    if (mounted) {
+      setState(() {
+        _locationPermissionGranted = permission == LocationPermission.always ||
+            permission == LocationPermission.whileInUse;
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -66,7 +88,7 @@ class __MapTrackingViewState extends State<_MapTrackingView> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Row(
           children: [
@@ -81,7 +103,7 @@ class __MapTrackingViewState extends State<_MapTrackingView> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Đóng'),
           ),
         ],
@@ -104,7 +126,9 @@ class __MapTrackingViewState extends State<_MapTrackingView> {
           left: 24,
           right: 24,
           top: 24,
-          bottom: MediaQuery.of(sheetContext).viewInsets.bottom + 24,
+          bottom: MediaQuery.of(sheetContext).viewInsets.bottom +
+              MediaQuery.of(sheetContext).viewPadding.bottom +
+              115,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -190,6 +214,10 @@ class __MapTrackingViewState extends State<_MapTrackingView> {
         }
 
         if (state is MapTrackingLoaded && state.firedAlarm != null) {
+          LocalNotificationService.showNotification(
+            '🔔 Đã đến: ${state.firedAlarm!.title}',
+            'Bạn đã đến điểm đến!',
+          );
           _showAlarmDialog(context, state.firedAlarm!);
         }
 
@@ -229,7 +257,7 @@ class __MapTrackingViewState extends State<_MapTrackingView> {
 
               GoogleMap(
                 initialCameraPosition: _initialCamera,
-                myLocationEnabled: true,
+                myLocationEnabled: _locationPermissionGranted,
                 myLocationButtonEnabled: false,
                 zoomControlsEnabled: false,
                 onMapCreated: (controller) => _mapController = controller,
@@ -354,7 +382,7 @@ class __MapTrackingViewState extends State<_MapTrackingView> {
                 ),
 
               Positioned(
-                bottom: MediaQuery.of(context).padding.bottom + 10,
+                bottom: MediaQuery.of(context).viewPadding.bottom + 115,
                 left: 24,
                 right: 24,
                 child: TrackingButton(

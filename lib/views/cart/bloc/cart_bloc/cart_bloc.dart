@@ -23,7 +23,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
 
       emit(state.copyWith(
         productMap: newMap,
-        unviewedCount: state.unviewedCount + 1,
+        unviewedCount: state.productMap.containsKey(productId) ? state.unviewedCount : state.unviewedCount + 1,
         status: CartStatus.success,
         message: "Đã thêm vào giỏ hàng",
       ));
@@ -45,7 +45,6 @@ class CartBloc extends Bloc<CartEvent, CartState> {
 
       emit(state.copyWith(
         productMap: newMap,
-        unviewedCount: 0,
         status: CartStatus.increaseSuccess,
         message: null,
       ));
@@ -120,15 +119,15 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     });
 
     on<StartCheckout>((event, emit) async {
-      final updatedMap = state.productMap.map((id, product) {
-        SharedPrefsHelper.saveCheckedOutProductId(id);
-        return MapEntry(id, product.copyWith(isCheckOut: true));
-      });
+      for (var product in state.productMap.values) {
+        await SharedPrefsHelper.saveCheckedOutProductId(product.id);
+      }
       
       emit(state.copyWith(
-        productMap: updatedMap,
+        productMap: {},
         isCheckoutMode: true,
       ));
+      emit(state.copyWith(isCheckoutMode: false));
     });
 
 

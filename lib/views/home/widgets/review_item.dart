@@ -110,6 +110,12 @@ class _WriteReviewFormState extends State<ReviewItem> {
   }
 
   void _saveReview() async {
+    if (_currentRating == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Vui lòng chọn số sao đánh giá"), backgroundColor: Colors.red),
+      );
+      return;
+    }
     final String imagesString = _selectedImages.map((e) => e.path).join(',');    
     Map<String, dynamic> review = {
       DatabaseHelper.columnProductId: widget.productId,

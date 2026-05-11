@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:shopdemo/models/product.dart';
+import 'package:shopdemo/services/dio_exception.dart';
 import 'package:shopdemo/services/product_service.dart';
 import 'package:shopdemo/models/category.dart';
 
@@ -12,7 +13,7 @@ class ProductRepository {
       final List<dynamic> data = response.data['products'];
       return data.map((json) => Product.fromJson(json)).toList();
     } on DioException catch (e) {
-      throw e.error.toString();
+      throw DioExceptions.fromDioError(e).toString();
     }
   }
 
@@ -22,7 +23,7 @@ class ProductRepository {
       final List<dynamic> data = response.data['products'];
       return data.map<String>((json) => json['thumbnail'] as String).toList();
     } on DioException catch (e) {
-      throw e.error.toString();
+      throw DioExceptions.fromDioError(e).toString();
     }
   }
 
@@ -32,7 +33,7 @@ class ProductRepository {
       final List<dynamic> data = response.data;
       return data.map((json) => Category.fromJson(json)).toList();
     } on DioException catch (e) {
-      throw e.error.toString();
+      throw DioExceptions.fromDioError(e).toString();
     }
   }
 
@@ -42,7 +43,7 @@ class ProductRepository {
       final List<dynamic> data = response.data['products'];
       return data.map((json) => Product.fromJson(json)).toList();
     } on DioException catch (e) {
-      throw e.error.toString();
+      throw DioExceptions.fromDioError(e).toString();
     }
   }
 
@@ -55,7 +56,7 @@ class ProductRepository {
       final List<dynamic> data = response.data['products'];
       return data.map((json) => Product.fromJson(json)).toList();
     } on DioException catch (e) {
-      throw e.error.toString();
+      throw DioExceptions.fromDioError(e).toString();
     }
   }
   

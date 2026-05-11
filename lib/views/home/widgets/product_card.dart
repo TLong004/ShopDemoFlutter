@@ -2,15 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shopdemo/models/product.dart';
 import 'package:shopdemo/views/cart/bloc/cart_bloc/cart_bloc.dart';
-import 'package:shopdemo/views/home/detail_page.dart';
+import 'package:go_router/go_router.dart';
+import 'package:shopdemo/widgets/network_image_widget.dart';
 
-class ProductCart extends StatelessWidget {
+class ProductCard extends StatelessWidget {
   final Product product;
-  const ProductCart({super.key, required this.product});
+  const ProductCard({super.key, required this.product});
 
   @override
   Widget build(BuildContext context) {
-    return Card( 
+    return Card(
       color: Colors.white,
       child: Stack(
         children: [
@@ -19,16 +20,13 @@ class ProductCart extends StatelessWidget {
             child: Row(
               children: [
                 Container(
-                  width: 100, 
-                  height: 100, 
+                  width: 100,
+                  height: 100,
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade200, 
-                    borderRadius: BorderRadius.circular(8), 
+                    color: Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Image.network(
-                    product.thumbnail, 
-                    fit: BoxFit.cover,
-                  ),
+                  child: NetworkImageWidget(url: product.thumbnail, fit: BoxFit.cover),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
@@ -36,13 +34,22 @@ class ProductCart extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       GestureDetector(
-                        onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => DetailPage(product: product,)));
-                        },
+                        onTap: () => context.push('/home/detail', extra: product),
                         child: Text(product.title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold))
                       ),
                       Text('\$${product.price}'),
-                      const SizedBox(height: 40), 
+                      const SizedBox(height: 15),
+                      Row(
+                        children: [
+                          const Icon(Icons.star, color: Colors.amber, size: 14),
+                          const SizedBox(width: 4),
+                          Text(
+                            '${product.rating}',
+                            style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 40),
                     ],
                   ),
                 ),
@@ -63,9 +70,7 @@ class ProductCart extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              child: const Text(
-                'Add to Cart',
-              ),
+              child: const Text('Add to Cart'),
             ),
           ),
         ],

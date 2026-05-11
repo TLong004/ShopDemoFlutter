@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:shopdemo/repositories/product_repository.dart';
-import 'package:shopdemo/services/bloc/connectivity_bloc.dart';
+import 'package:shopdemo/blocs/connectivity_bloc.dart';
+import 'package:shopdemo/router/app_router.dart';
 import 'package:shopdemo/services/googlemap_service.dart';
 import 'package:shopdemo/services/local_notification_service.dart';
 import 'package:shopdemo/services/notification_service.dart';
@@ -60,12 +61,10 @@ class MyApp extends StatelessWidget {
             ),
           ),
         ],
-        child: MaterialApp(
-          title: 'Flutter Demo',
-          theme: ThemeData(primarySwatch: Colors.blue),
+         child: MaterialApp.router(
+          routerConfig: appRouter,
           debugShowCheckedModeBanner: false,
-          home: const MainPage(),
-        ),
+        )
       ),
     );
   }

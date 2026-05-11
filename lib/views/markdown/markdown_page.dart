@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
-class MarkdownDemo extends StatelessWidget {
+class MarkdownPage extends StatelessWidget {
+  const MarkdownPage({super.key});
   final String data = """
 # Tiêu đề lớn (H1)
 Đây là một đoạn văn bản có **in đậm** và *in nghiêng*.
@@ -17,11 +18,11 @@ class MarkdownDemo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Markdown trong Flutter")),
+      appBar: AppBar(title: const Text("Markdown trong Flutter")),
       body: Markdown(
         data: data,
         onTapLink: (text, href, title) {
-          print("Người dùng nhấn vào link: $href");
+          debugPrint("Người dùng nhấn vào link: $href");
         },
       ),
     );

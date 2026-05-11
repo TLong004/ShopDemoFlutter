@@ -2,7 +2,7 @@ part of 'map_tracking_bloc.dart';
 
 sealed class MapTrackingState extends Equatable {
   const MapTrackingState();
-  
+
   @override
   List<Object?> get props => [];
 }

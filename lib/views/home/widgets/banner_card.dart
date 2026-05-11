@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shopdemo/views/home/cubit/banner_cubit.dart';
+import 'package:shopdemo/widgets/network_image_widget.dart';
 
 class BannerWidget extends StatelessWidget {
   
@@ -29,17 +30,25 @@ class BannerWidget extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10),
                       color: Colors.grey.shade200,
                     ),
-                    child: Image.network(
-                      banners[index],
-                      fit: BoxFit.contain,
-                    ),
+                    child: NetworkImageWidget(url: banners[index], fit: BoxFit.contain),
                   );
                 }
               ),
             );
           } else if (state is BannerError) {
-            return Center(child: Text('Error: ${state.message}'));
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.image_not_supported_outlined, size: 40, color: Colors.grey),
+                const SizedBox(height: 8),
+                Text(
+                  state.message,
+                  style: const TextStyle(color: Colors.grey, fontSize: 13),
+                ),
+              ],
+            );
           }
+
           return const Center(child: Text('No banners found.'));
         },
       ),

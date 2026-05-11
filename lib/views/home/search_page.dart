@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shopdemo/models/product.dart';
 import 'package:shopdemo/views/home/bloc/product_bloc/product_bloc.dart';
-import 'package:shopdemo/views/home/widgets/product_cart.dart';
+import 'package:go_router/go_router.dart';
+import 'package:shopdemo/views/home/widgets/product_card.dart';
 
 class SearchPage extends StatefulWidget {
 
@@ -37,8 +38,8 @@ class _SearchPageState extends State<SearchPage> {
         leading: IconButton(
           onPressed: () {
             context.read<ProductBloc>().add(ClearSearch());
-            Navigator.pop(context);
-          }, 
+            context.pop();
+          },
           icon: const Icon(Icons.arrow_back_ios),
         ),
       ),
@@ -49,9 +50,6 @@ class _SearchPageState extends State<SearchPage> {
               TextField(
                 controller: _controller,
                 onChanged: (value) {
-                  setState(() {
-                    
-                  });
                   context.read<ProductBloc>().add(SearchProduct(_controller.text));
                 },
                 onSubmitted: (value) {
@@ -90,14 +88,37 @@ class _SearchPageState extends State<SearchPage> {
                   return ListView.builder(
                     itemCount: state.products.length,
                     itemBuilder: (context, index) {
-                      return ProductCart(product: products[index]);
+                      return ProductCard(product: products[index]);
                     }
                   );
-                } else if (state is ProductError) {
-                  return Container(
-                    child: Center(child: Text(state.message, style: TextStyle(color: Colors.red))),
+               } else if (state is ProductError) {
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(32),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.wifi_off_rounded, size: 48, color: Colors.grey),
+                          const SizedBox(height: 12),
+                          Text(
+                            state.message,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(color: Colors.grey, fontSize: 14),
+                          ),
+                          const SizedBox(height: 20),
+                          ElevatedButton.icon(
+                            onPressed: () => context.read<ProductBloc>().add(
+                              SearchProduct(_controller.text),
+                            ),
+                            icon: const Icon(Icons.refresh),
+                            label: const Text('Thử lại'),
+                          ),
+                        ],
+                      ),
+                    ),
                   );
                 }
+
                 return Center(child: Text("Nhập từ khoá để tìm sản phẩm"),);
               }
             ),

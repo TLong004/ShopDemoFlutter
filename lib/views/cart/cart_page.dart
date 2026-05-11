@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shopdemo/views/cart/bloc/cart_bloc/cart_bloc.dart';
-import 'package:shopdemo/views/cart/widgets/product_card_2.dart';
+import 'package:shopdemo/views/cart/widgets/product_card_cart.dart';
 
 class CartPage extends StatelessWidget {
   const CartPage({super.key});
@@ -15,18 +15,17 @@ class CartPage extends StatelessWidget {
         backgroundColor: Colors.white,
       ),
        body: BlocListener<CartBloc, CartState>(
-        listenWhen: (previous, current) => previous.status != current.status && current.status == CartStatus.deleteSuccess,
-        listener: (context, state) {
-          if (state.message != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message!),
-                backgroundColor: Colors.green,
-                duration: const Duration(seconds: 1),
-              ),
-            );
-          }
-        },
+      listenWhen: (previous, current) =>
+          !previous.isCheckoutMode && current.isCheckoutMode,
+      listener: (context, state) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Đặt hàng thành công!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      },
+
 
         child: BlocBuilder<CartBloc, CartState>(
           builder: (context, state) {
@@ -49,7 +48,7 @@ class CartPage extends StatelessWidget {
                   itemCount: state.products.length,
                   itemBuilder: (context, index) {
                     final product = state.products[index];
-                    return ProductCard2(product: product);
+                    return ProductCardCart(product: product);
                   }
                 );
               }

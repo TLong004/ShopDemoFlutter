@@ -61,5 +61,3 @@ class AlarmFiredEvent extends MapTrackingEvent {
   @override
   List<Object> get props => [alarm];
 }
-
-

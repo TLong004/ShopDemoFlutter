@@ -13,13 +13,11 @@ class ConnectivityBloc extends Bloc<ConnectivityEvent, ConnectivityState> {
   ConnectivityBloc() : super(const ConnectivityState(ConnectivityStatus.connected)) {
     on<ConnectivityChanged>((event, emit) {
       if (event.result.contains(ConnectivityResult.none)){
-        if (state.status != ConnectivityStatus.disconnected) { // Chỉ emit nếu trạng thái thực sự thay đổi
-          print('DEBUG: ConnectivityBloc emitting Disconnected state.');
+        if (state.status != ConnectivityStatus.disconnected) {
           emit(const ConnectivityState(ConnectivityStatus.disconnected));
         }
       } else {
-        if (state.status != ConnectivityStatus.connected) { // Chỉ emit nếu trạng thái thực sự thay đổi
-          print('DEBUG: ConnectivityBloc emitting Connected state.');
+        if (state.status != ConnectivityStatus.connected) {
           emit(const ConnectivityState(ConnectivityStatus.connected));
         }
       }

@@ -13,4 +13,3 @@ final class ConnectivityChanged extends ConnectivityEvent {
   @override
   List<Object> get props => [result];
 }
-

@@ -41,7 +41,7 @@ class MapTrackingServiceHandler extends TaskHandler {
 
     const LocationSettings locationSettings = LocationSettings(
       accuracy: LocationAccuracy.high,
-      distanceFilter: 0,
+      distanceFilter: 5,
     );
 
     _positionStream = Geolocator.getPositionStream(
@@ -77,19 +77,20 @@ class MapTrackingServiceHandler extends TaskHandler {
         newLocation.latitude,
         newLocation.longitude,
       );
-      if (distance > 0) {
-        _totalDistance += distance;
-      }
+      if (distance < 2) return; // bỏ qua điểm quá gần (GPS jitter)
+      _totalDistance += distance;
     }
 
     _lastLocation = newLocation;
     _locationHistory.add(newLocation);
 
     bool isAlarmFiring = false;
+    AlarmModel? firedAlarm;
     final List<AlarmModel> updatedAlarms = _alarms.map((alarm) {
       if (alarm.isActive && alarm.shouldTrigger(newLocation)) {
         dev.log('MapTrackingServiceHandler: ALARM FIRED: ${alarm.title}');
         isAlarmFiring = true;
+        firedAlarm = alarm;
         return alarm.copyWith(isActive: false);
       }
       return alarm;
@@ -116,8 +117,8 @@ class MapTrackingServiceHandler extends TaskHandler {
     });
 
     FlutterForegroundTask.updateService(
-      notificationTitle: isAlarmFiring
-          ? '🔔 Đã đến: ${_alarms.firstWhere((a) => !a.isActive, orElse: () => AlarmModel(id: '', title: 'Điểm đến')).title}'
+      notificationTitle: isAlarmFiring && firedAlarm != null
+          ? '🔔 Đã đến: ${firedAlarm!.title}'
           : 'Đang theo dõi lộ trình',
       notificationText: isAlarmFiring
           ? 'Bạn đã đến đích!'

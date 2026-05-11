@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\phaml\\\\ProjectFlutter\\\\Demo\\\\ShopDemoFlutter\" -Recurse -Include \"*.dart\" -File)",
+      "Bash(Select-Object FullName)",
+      "Bash(ConvertTo-Csv -NoTypeInformation)"
+    ]
+  }
+}

@@ -31,15 +31,19 @@ class StatsPanel extends StatelessWidget {
         children: [
           _StatItem(
             icon: Icons.route,
-            value: '${(totalDistance / 1000).toStringAsFixed(2)}',
-            unit: 'km',
+            value: isTracking || totalDistance > 0
+                ? '${(totalDistance / 1000).toStringAsFixed(2)}'
+                : '--',
+            unit: isTracking || totalDistance > 0 ? 'km' : '',
             color: Colors.blue,
           ),
           Container(width: 1, height: 32, color: Colors.grey.shade200),
           _StatItem(
             icon: Icons.location_on,
-            value: '$routePointsCount',
-            unit: 'điểm',
+            value: isTracking || routePointsCount > 0
+                ? '$routePointsCount'
+                : '--',
+            unit: isTracking || routePointsCount > 0 ? 'điểm' : '',
             color: Colors.green,
           ),
           Container(width: 1, height: 32, color: Colors.grey.shade200),

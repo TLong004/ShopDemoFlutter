@@ -1,40 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shopdemo/services/bloc/connectivity_bloc.dart';
-import 'package:shopdemo/views/cart/cart_page.dart';
+import 'package:go_router/go_router.dart';
+import 'package:shopdemo/blocs/connectivity_bloc.dart';
 import 'package:shopdemo/views/cart/bloc/cart_bloc/cart_bloc.dart';
-import 'package:shopdemo/views/chart/chart.dart';
-import 'package:shopdemo/views/google_map/map_tracking_screen.dart';
-import 'package:shopdemo/views/home/home_page.dart';
-import 'package:shopdemo/views/profile/profile_page.dart';
-import 'package:shopdemo/views/wallet/wallet_page.dart';
 import 'package:shopdemo/views/home/bloc/product_bloc/product_bloc.dart';
 import 'package:shopdemo/views/home/cubit/banner_cubit.dart';
 import 'package:shopdemo/views/home/cubit/category_cubit.dart';
 
 class MainPage extends StatefulWidget {
-  const MainPage({super.key});
+  final StatefulNavigationShell shell;
+  const MainPage({super.key, required this.shell});
 
   @override
   State<MainPage> createState() => _MainPageState();
 }
 
 class _MainPageState extends State<MainPage> {
-  int _currentIndex = 0;
-
-  List<Widget> _buildPages() {
-    return [
-      const HomePage(),
-      const CartPage(),
-      const WalletPage(),
-      const ProfilePage(),
-      _currentIndex == 4 ? Chart() : const SizedBox.shrink(),
-       MapTrackingScreen(),
-      //AlarmScreen(),
-      //MarkdownDemo(),
-    ];
-  }
-
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<ConnectivityBloc, ConnectivityState>(
@@ -48,21 +29,21 @@ class _MainPageState extends State<MainPage> {
             SnackBar(
               content: const Text("Không có kết nối internet"),
               backgroundColor: Colors.red,
-              duration: Duration(days: 1), 
+              duration: const Duration(days: 1),
               showCloseIcon: true,
               behavior: SnackBarBehavior.floating,
             ),
           );
         } else if (state.status == ConnectivityStatus.connected) {
           messenger.showSnackBar(
-            SnackBar(
+            const SnackBar(
               content: Text("Đã có kết nối trở lại"),
               backgroundColor: Colors.green,
-              duration: const Duration(seconds: 3), 
+              duration: Duration(seconds: 3),
               behavior: SnackBarBehavior.floating,
             ),
           );
- 
+
           Future.delayed(const Duration(milliseconds: 500), () {
             if (context.mounted) {
               context.read<ProductBloc>().add(LoadProducts());
@@ -73,28 +54,25 @@ class _MainPageState extends State<MainPage> {
         }
       },
       builder: (context, state) {
-        return  Scaffold(
+        return Scaffold(
           extendBody: true,
-          body: IndexedStack(
-            index: _currentIndex,
-            children: _buildPages(),
-          ),
+          body: widget.shell,
           bottomNavigationBar: _buildCustomBottomBar(),
         );
-      }
+      },
     );
   }
 
   Widget _buildCustomBottomBar() {
     return Container(
-      margin: const EdgeInsets.fromLTRB(16, 0, 16, 30), 
-      height: 65, 
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 30),
+      height: 75,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(35),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
@@ -103,49 +81,62 @@ class _MainPageState extends State<MainPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Expanded(child: _buildNavItem(Icons.home, Icons.home_outlined, 0)),
+          Expanded(child: _buildNavItem(Icons.home, Icons.home_outlined, 0, "Trang chủ")),
           Expanded(child: _buildCartNavItem(Icons.shopping_cart, Icons.shopping_cart_outlined, 1)),
-          Expanded(child: _buildNavItem(Icons.account_balance_wallet, Icons.account_balance_wallet_outlined, 2)),
-          Expanded(child: _buildNavItem(Icons.person, Icons.person_outline, 3)),
-          Expanded(child: _buildNavItem(Icons.pie_chart, Icons.pie_chart_outline, 4)),
-          Expanded(child: _buildNavItem(Icons.map, Icons.map_outlined, 5)),
+          Expanded(child: _buildNavItem(Icons.account_balance_wallet, Icons.account_balance_wallet_outlined, 2, "Ví điện tử")),
+          Expanded(child: _buildNavItem(Icons.person, Icons.person_outline, 3, "Tài khoản")),
+          Expanded(child: _buildNavItem(Icons.pie_chart, Icons.pie_chart_outline, 4, "Thống kê")),
+          Expanded(child: _buildNavItem(Icons.map, Icons.map_outlined, 5, "Bản đồ")),
         ],
       ),
     );
   }
 
-  Widget _buildIconContent(IconData activeIcon, IconData inactiveIcon, bool isSelected) {
-    return Center( 
+  Widget _buildIconContent(IconData activeIcon, IconData inactiveIcon, bool isSelected, String label) {
+    return Center(
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
-        padding: const EdgeInsets.all(6), 
+        padding: const EdgeInsets.all(6),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.blue.withOpacity(0.1) : Colors.transparent,
+          color: isSelected ? Colors.blue.withValues(alpha: 0.1) : Colors.transparent,
           shape: BoxShape.circle,
         ),
-        child: Icon(
-          isSelected ? activeIcon : inactiveIcon,
-          color: isSelected ? Colors.blueAccent : Colors.grey.shade500,
-          size: 24, 
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              isSelected ? activeIcon : inactiveIcon,
+              color: isSelected ? Colors.blueAccent : Colors.grey.shade500,
+              size: 22,
+            ),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 10,
+                color: isSelected ? Colors.blueAccent : Colors.grey.shade500,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildNavItem(IconData activeIcon, IconData inactiveIcon, int index) {
-    bool isSelected = _currentIndex == index;
+  Widget _buildNavItem(IconData activeIcon, IconData inactiveIcon, int index, String label) {
+    final isSelected = widget.shell.currentIndex == index;
     return GestureDetector(
-      onTap: () => setState(() => _currentIndex = index),
+      onTap: () => widget.shell.goBranch(index),
       behavior: HitTestBehavior.opaque,
-      child: _buildIconContent(activeIcon, inactiveIcon, isSelected),
+      child: _buildIconContent(activeIcon, inactiveIcon, isSelected, label),
     );
   }
 
   Widget _buildCartNavItem(IconData activeIcon, IconData inactiveIcon, int index) {
-    bool isSelected = _currentIndex == index;
+    final isSelected = widget.shell.currentIndex == index;
     return GestureDetector(
       onTap: () {
-        setState(() => _currentIndex = index);
+        widget.shell.goBranch(index);
         context.read<CartBloc>().add(MarkCartAsViewed());
       },
       behavior: HitTestBehavior.opaque,
@@ -156,7 +147,7 @@ class _MainPageState extends State<MainPage> {
             label: Text('$count'),
             isLabelVisible: count > 0,
             backgroundColor: Colors.redAccent,
-            child: _buildIconContent(activeIcon, inactiveIcon, isSelected),
+            child: _buildIconContent(activeIcon, inactiveIcon, isSelected, "Giỏ hàng"),
           );
         },
       ),

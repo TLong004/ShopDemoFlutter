@@ -14,7 +14,7 @@ class MapTrackingBloc extends Bloc<MapTrackingEvent, MapTrackingState> {
 
   MapTrackingBloc({GooglemapService? service})
       : _service = service ?? GooglemapService.instance,
-        super( MapTrackingInitial()) {
+        super(MapTrackingInitial()) {
     _service.addLocationCallback(_onLocationUpdate);
     _service.addStatsCallback(_onStatsUpdate);
     _syncServiceState();
@@ -28,11 +28,8 @@ class MapTrackingBloc extends Bloc<MapTrackingEvent, MapTrackingState> {
     on<AlarmFiredEvent>(_onAlarmFired);
   }
 
-  
-
   Future<void> _syncServiceState() async {
     final isRunning = await FlutterForegroundTask.isRunningService;
-    print('=== syncServiceState: isRunning=$isRunning ===');
     if (isRunning) {
       emit(const MapTrackingLoaded(
         routePoints: [],
@@ -44,6 +41,14 @@ class MapTrackingBloc extends Bloc<MapTrackingEvent, MapTrackingState> {
   MapTrackingLoaded get _currentLoaded {
     final state = this.state;
     if (state is MapTrackingLoaded) return state;
+    if (state is MapTrackingStopped) {
+      return MapTrackingLoaded(
+        routePoints: state.routePoints,
+        totalDistance: state.totalDistance,
+        activeAlarms: state.activeAlarms,
+        currentLocation: state.currentLocation,
+      );
+    }
     return const MapTrackingLoaded(
       routePoints: [],
       totalDistance: 0.0,
@@ -54,13 +59,10 @@ class MapTrackingBloc extends Bloc<MapTrackingEvent, MapTrackingState> {
     StartTrackingEvent event,
     Emitter<MapTrackingState> emit,
   ) async {
-    debugPrint('=== _onStartTracking called ===');
+    final current = _currentLoaded;
     emit(MapTrackingLoading());
     try {
-      final current = _currentLoaded;
-      print('=== Calling _service.start() ===');
       await _service.start(alarms: current.activeAlarms);
-      debugPrint('=== _service.start() SUCCESS ===');
       emit(MapTrackingLoaded(
         routePoints: current.routePoints,
         totalDistance: current.totalDistance,
@@ -68,10 +70,10 @@ class MapTrackingBloc extends Bloc<MapTrackingEvent, MapTrackingState> {
         currentLocation: current.currentLocation,
       ));
     } catch (e) {
-      print('=== _onStartTracking ERROR: $e ===');
       emit(MapTrackingError(e.toString()));
     }
   }
+
   void _onStopTracking(StopTrackingEvent event, Emitter<MapTrackingState> emit) async {
     try {
       await _service.stop();
@@ -90,20 +92,30 @@ class MapTrackingBloc extends Bloc<MapTrackingEvent, MapTrackingState> {
   void _onResetRoute(ResetRouteEvent event, Emitter<MapTrackingState> emit) async {
     try {
       await _service.resetRoute();
-      final current = _currentLoaded;
-      emit(MapTrackingLoaded(
-        routePoints: [],
-        totalDistance: 0.0,
-        activeAlarms: current.activeAlarms,
-        currentLocation: current.currentLocation,
-      ));
+      final currentState = state;
+      if (currentState is MapTrackingLoaded) {
+        emit(MapTrackingLoaded(
+          routePoints: [],
+          totalDistance: 0.0,
+          activeAlarms: currentState.activeAlarms,
+          currentLocation: currentState.currentLocation,
+        ));
+      } else if (currentState is MapTrackingStopped) {
+        emit(MapTrackingStopped(
+          routePoints: [],
+          totalDistance: 0.0,
+          activeAlarms: currentState.activeAlarms,
+          currentLocation: currentState.currentLocation,
+        ));
+      }
     } catch (e) {
       emit(MapTrackingError(e.toString()));
     }
   }
 
   void _onLocationUpdated(LocationUpdateEvent event, Emitter<MapTrackingState> emit) {
-    final current = _currentLoaded;
+    if (state is! MapTrackingLoaded) return;
+    final current = state as MapTrackingLoaded;
     try {
       emit(MapTrackingLoaded(
         routePoints: [...current.routePoints, event.location],
@@ -116,13 +128,15 @@ class MapTrackingBloc extends Bloc<MapTrackingEvent, MapTrackingState> {
       emit(MapTrackingError(e.toString()));
     }
   }
+
   void _onTrackingStatsUpdate(TrackingStatsUpdateEvent event, Emitter<MapTrackingState> emit) {
-    final current = _currentLoaded;
+    if (state is! MapTrackingLoaded) return;
+    final current = state as MapTrackingLoaded;
     try {
       emit(MapTrackingLoaded(
         routePoints: current.routePoints,
         totalDistance: event.totalDistance,
-        activeAlarms: current.activeAlarms,
+        activeAlarms: event.alarms.isNotEmpty ? event.alarms : current.activeAlarms,
         currentLocation: current.currentLocation,
         firedAlarm: null,
       ));
@@ -130,26 +144,59 @@ class MapTrackingBloc extends Bloc<MapTrackingEvent, MapTrackingState> {
       emit(MapTrackingError(e.toString()));
     }
   }
+
   void _onAddAlarm(AddAlarmEvent event, Emitter<MapTrackingState> emit) {
-    final current = _currentLoaded;
-    final updatedAlarms = List<AlarmModel>.from(current.activeAlarms)..add(event.alarm);
-    emit(MapTrackingLoaded(
-      routePoints: current.routePoints,
-      totalDistance: current.totalDistance,
-      activeAlarms: updatedAlarms,
-      currentLocation: current.currentLocation,
-    ));
+    final currentState = state;
+    if (currentState is MapTrackingLoaded) {
+      final updatedAlarms = [...currentState.activeAlarms, event.alarm];
+      emit(MapTrackingLoaded(
+        routePoints: currentState.routePoints,
+        totalDistance: currentState.totalDistance,
+        activeAlarms: updatedAlarms,
+        currentLocation: currentState.currentLocation,
+      ));
+      _service.sendAlarms(updatedAlarms);
+      final loc = currentState.currentLocation;
+      if (loc != null && event.alarm.shouldTrigger(loc)) {
+        add(AlarmFiredEvent(event.alarm));
+      }
+    } else if (currentState is MapTrackingStopped) {
+      emit(MapTrackingStopped(
+        routePoints: currentState.routePoints,
+        totalDistance: currentState.totalDistance,
+        activeAlarms: [...currentState.activeAlarms, event.alarm],
+        currentLocation: currentState.currentLocation,
+      ));
+    } else {
+      emit(MapTrackingStopped(
+        routePoints: const [],
+        totalDistance: 0,
+        activeAlarms: [event.alarm],
+      ));
+    }
   }
+
   void _onRemoveAlarm(RemoveAlarmEvent event, Emitter<MapTrackingState> emit) {
-    final current = _currentLoaded;
-    final updatedAlarms = List<AlarmModel>.from(current.activeAlarms)..removeWhere((alarm) => alarm.id == event.alarmId);
-    emit(MapTrackingLoaded(
-      routePoints: current.routePoints,
-      totalDistance: current.totalDistance,
-      activeAlarms: updatedAlarms,
-      currentLocation: current.currentLocation,
-    ));
+    final currentState = state;
+    if (currentState is MapTrackingLoaded) {
+      final updatedAlarms = currentState.activeAlarms.where((a) => a.id != event.alarmId).toList();
+      emit(MapTrackingLoaded(
+        routePoints: currentState.routePoints,
+        totalDistance: currentState.totalDistance,
+        activeAlarms: updatedAlarms,
+        currentLocation: currentState.currentLocation,
+      ));
+      _service.sendAlarms(updatedAlarms);
+    } else if (currentState is MapTrackingStopped) {
+      emit(MapTrackingStopped(
+        routePoints: currentState.routePoints,
+        totalDistance: currentState.totalDistance,
+        activeAlarms: currentState.activeAlarms.where((a) => a.id != event.alarmId).toList(),
+        currentLocation: currentState.currentLocation,
+      ));
+    }
   }
+
   void _onAlarmFired(AlarmFiredEvent event, Emitter<MapTrackingState> emit) {
     final current = _currentLoaded;
     final updatedAlarms = current.activeAlarms

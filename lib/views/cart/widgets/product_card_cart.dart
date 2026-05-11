@@ -2,15 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shopdemo/models/product.dart';
 import 'package:shopdemo/views/cart/bloc/cart_bloc/cart_bloc.dart';
+import 'package:shopdemo/widgets/network_image_widget.dart';
 
-class ProductCard2 extends StatelessWidget {
+class ProductCardCart extends StatefulWidget {
   final Product product;
-  ProductCard2({super.key, required this.product});
+  const ProductCardCart({super.key, required this.product});
+
+  @override
+  State<ProductCardCart> createState() => _ProductCardCartState();
+}
+
+class _ProductCardCartState extends State<ProductCardCart> {
   final _controller = TextEditingController();
 
   @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Card( 
+    return Card(
       color: Colors.white,
       child: Stack(
         children: [
@@ -19,25 +32,22 @@ class ProductCard2 extends StatelessWidget {
             child: Row(
               children: [
                 Container(
-                  width: 100, 
-                  height: 100, 
+                  width: 100,
+                  height: 100,
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade200, 
-                    borderRadius: BorderRadius.circular(8), 
+                    color: Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Image.network(
-                    product.thumbnail, 
-                    fit: BoxFit.cover,
-                  ),
+                  child: NetworkImageWidget(url: widget.product.thumbnail, fit: BoxFit.cover),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(product.title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                      Text('\$${product.price}'),
-                      const SizedBox(height: 40), 
+                      Text(widget.product.title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      Text('\$${widget.product.price}'),
+                      const SizedBox(height: 40),
                     ],
                   ),
                 ),
@@ -48,7 +58,7 @@ class ProductCard2 extends StatelessWidget {
             bottom: 5,
             right: 5,
             child: BlocSelector<CartBloc, CartState, int>(
-              selector: (state) => state.productMap[product.id]?.quantity ?? 0,
+              selector: (state) => state.productMap[widget.product.id]?.quantity ?? 0,
               builder: (context, state) {
                 _controller.text = state.toString();
                 return AnimatedSwitcher(
@@ -66,7 +76,7 @@ class ProductCard2 extends StatelessWidget {
                             IconButton(
                               onPressed: () {
                                 final cartState = context.read<CartBloc>().state;
-                                final currentProductInCart = cartState.productMap[product.id] ?? product;
+                                final currentProductInCart = cartState.productMap[widget.product.id] ?? widget.product;
                                 context.read<CartBloc>().add(DecreaseQuantity(currentProductInCart));
                               },
                               icon: const Icon(Icons.remove, size: 18, color: Colors.blue),
@@ -80,16 +90,16 @@ class ProductCard2 extends StatelessWidget {
                                 onSubmitted: (value) {
                                   final int? newQua = int.tryParse(value);
                                   if (newQua != null) {
-                                    context.read<CartBloc>().add(UpdateQuantity(product, newQua));
+                                    context.read<CartBloc>().add(UpdateQuantity(widget.product, newQua));
                                   } else {
                                     _controller.text = state.toString();
                                   }
                                 },
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 14,
                                 ),
-                                decoration: InputDecoration(
+                                decoration: const InputDecoration(
                                   contentPadding: EdgeInsets.zero,
                                   border: InputBorder.none,
                                 ),
@@ -98,7 +108,7 @@ class ProductCard2 extends StatelessWidget {
                             IconButton(
                               onPressed: () {
                                 final cartState = context.read<CartBloc>().state;
-                                final currentProductInCart = cartState.productMap[product.id] ?? product;
+                                final currentProductInCart = cartState.productMap[widget.product.id] ?? widget.product;
                                 context.read<CartBloc>().add(IncreaseQuantity(currentProductInCart));
                               },
                               icon: const Icon(Icons.add, size: 18, color: Colors.blue),
@@ -106,12 +116,10 @@ class ProductCard2 extends StatelessWidget {
                           ],
                         ),
                       ),
-                      
                       const SizedBox(width: 8),
-                
                       TextButton.icon(
                         onPressed: () {
-                          context.read<CartBloc>().add(RemoveToCart(product));
+                          context.read<CartBloc>().add(RemoveToCart(widget.product));
                         },
                         icon: const Icon(Icons.delete_outline, color: Colors.red, size: 20),
                         label: const Text('Remove', style: TextStyle(color: Colors.red)),

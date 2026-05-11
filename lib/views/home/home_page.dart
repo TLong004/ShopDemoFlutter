@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shopdemo/views/cart/bloc/cart_bloc/cart_bloc.dart';
 import 'package:shopdemo/views/home/bloc/product_bloc/product_bloc.dart';
-import 'package:shopdemo/views/home/search_page.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shopdemo/views/home/widgets/banner_card.dart';
 import 'package:shopdemo/views/home/widgets/category_card.dart';
-import 'package:shopdemo/views/home/widgets/product_cart.dart';
+import 'package:shopdemo/views/home/widgets/product_card.dart';
+import 'package:shopdemo/widgets/product_skeleton.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -19,12 +20,7 @@ class HomePage extends StatelessWidget {
         backgroundColor: Colors.white,
         actions: [
           IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => SearchPage()),
-              );
-            },
+            onPressed: () => context.push('/home/search'),
             icon: Icon(Icons.search),
           ),
         ],
@@ -59,35 +55,55 @@ class HomePage extends StatelessWidget {
               ),
               BlocBuilder<ProductBloc, ProductState>(
                 builder: (context, state) {
-                  if (state is ProductInitial) {
-                    context.read<ProductBloc>().add(LoadProducts());
-                    return const SliverFillRemaining(
-                      child: Center(child: CircularProgressIndicator()),
-                    );
-                  } else if (state is ProductLoading) {
-                    return const SliverFillRemaining(
-                      child: Center(child: CircularProgressIndicator()),
+                  if (state is ProductLoading) {
+                    return SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) => const ProductSkeleton(),
+                        childCount: 6,  // hiện 6 skeleton card
+                      ),
                     );
                   } else if (state is ProductLoaded) {
                     final products = state.products;
                     return SliverList(
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
-                          return ProductCart(product: products[index]);
+                          return ProductCard(product: products[index]);
                         },
                         childCount: products.length,
                       ),
                     );
                   } else if (state is ProductError) {
                     return SliverFillRemaining(
-                      child: Center(child: Text('Error: ${state.message}')),
+                      child: Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(32),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.cloud_off_rounded, size: 64, color: Colors.grey),
+                              const SizedBox(height: 16),
+                              Text(
+                                state.message,   
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(color: Colors.grey, fontSize: 15),
+                              ),
+                              const SizedBox(height: 24),
+                              ElevatedButton.icon(
+                                onPressed: () => context.read<ProductBloc>().add(LoadProducts()),
+                                icon: const Icon(Icons.refresh),
+                                label: const Text('Thử lại'),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     );
-                  } else if (state is ProductByCategoryLoaded) {
+                  }  else if (state is ProductByCategoryLoaded) {
                     final products = state.products;
                     return SliverList(
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
-                          return ProductCart(product: products[index]);
+                          return ProductCard(product: products[index]);
                         },
                         childCount: products.length,
                       ),

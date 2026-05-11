@@ -1,4 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.CAMERA" />
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
@@ -56,14 +57,10 @@
         <meta-data android:name="com.google.android.geo.API_KEY"
                android:value="AIzaSyCrmwXtjv_s6YJ2vEvke8_HklWmaL1uT8w"/>
 
-        <service 
-            android:name="com.pravera.flutter_foreground_task.service.ForegroundService"
-            android:foregroundServiceType="dataSync|remoteMessaging"
-            android:exported="false" />
         <service
-    android:name="com.pravera.flutter_foreground_task.service.ForegroundService"
-    android:foregroundServiceType="dataSync|remoteMessaging|location" 
-    android:exported="false" />
+            android:name="com.pravera.flutter_foreground_task.service.ForegroundService"
+            android:foregroundServiceType="dataSync|remoteMessaging|location"
+            android:exported="false" />
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and
